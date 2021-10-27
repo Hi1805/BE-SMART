@@ -30,7 +30,7 @@ app.get("/api", async (req, res) => {
       });
     }
     const newList2 = await Promise.all(newList);
-    return res.status(200).send(newList2);
+    return res.status(200).send(newList2.slice(0, 5));
   } catch (error) {
     return res.status(401).send("errror");
   }
