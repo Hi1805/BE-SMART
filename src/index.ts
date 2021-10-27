@@ -68,6 +68,14 @@ const updateSchedule = async () => {
 
 const job = new CronJob(
   "0 0 1 * *",
+  updateSchedule,
+  null,
+  false,
+  "America/Los_Angeles"
+);
+job.start();
+const job2 = new CronJob(
+  "* & * * *",
   function () {
     console.log("You will see this message every second");
   },
@@ -75,4 +83,4 @@ const job = new CronJob(
   false,
   "America/Los_Angeles"
 );
-job.start();
+job2.start();
