@@ -9,13 +9,15 @@ const port = 4000;
 
 app.get("/api", async (req, res) => {
   try {
-    const listStudent = (await db.collection("Students").get()).docs.map(
-      async (response) => {
-        const student = response.data();
-        const attendances = (
+    const list = (await db.collection("Students").get()).docs;
+    const newList = [];
+    for (const student of list) {
+      newList.push({
+        student: student.data(),
+        attendances: (
           await db
             .collection("Students")
-            .doc(response.id)
+            .doc(student.id)
             .collection("attendance")
             .get()
         ).docs.map((att) => {
@@ -23,16 +25,12 @@ app.get("/api", async (req, res) => {
             date: att.id,
             data: att.data(),
           };
-        });
-        return {
-          ...student,
-          attendances,
-          uid: student.id,
-        };
-      }
-    );
-    const newList = await Promise.all(listStudent);
-    return res.status(200).send(newList);
+        }),
+        uid: student.id,
+      });
+    }
+    const newList2 = await Promise.all(newList);
+    return res.status(200).send(newList2);
   } catch (error) {
     return res.status(401).send("errror");
   }
