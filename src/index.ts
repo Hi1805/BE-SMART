@@ -46,7 +46,7 @@ app.get("/api", async (req, res) => {
     const newList = await Promise.all(listStudent);
     return res.status(200).send(newList);
   } catch (error) {
-    console.log(error);
+    return res.status(401).send("errror");
   }
 });
 app.listen(port, () => {
