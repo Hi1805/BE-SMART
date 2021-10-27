@@ -75,7 +75,7 @@ const job = new CronJob(
 );
 job.start();
 const job2 = new CronJob(
-  "* & * * *",
+  "* * * * *",
   function () {
     console.log("You will see this message every second");
   },
