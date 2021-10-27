@@ -1,20 +1,9 @@
 import { db } from "./connect";
 import * as express from "express";
 import * as cors from "cors";
-import { updateSchedule } from "./cronjob";
 const app = express();
 app.use(cors());
 app.use(express.json());
-
-const CronJob = require("cron").CronJob;
-const job = new CronJob(
-  "0 0 1 * *",
-  updateSchedule,
-  null,
-  true,
-  "America/Los_Angeles"
-);
-job.start();
 
 const port = 4000;
 
@@ -23,7 +12,6 @@ app.get("/api", async (req, res) => {
     const listStudent = (await db.collection("Students").get()).docs.map(
       async (response) => {
         const student = response.data();
-
         const attendances = (
           await db
             .collection("Students")
@@ -50,5 +38,5 @@ app.get("/api", async (req, res) => {
   }
 });
 app.listen(port, () => {
-  console.log("listening on http://localhost:4000/api" + port);
+  console.log("listening on http://localhost:4000/api");
 });
