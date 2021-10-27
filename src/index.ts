@@ -70,17 +70,7 @@ const job = new CronJob(
   "0 0 1 * *",
   updateSchedule,
   null,
-  false,
+  true,
   "America/Los_Angeles"
 );
 job.start();
-const job2 = new CronJob(
-  "* * * * *",
-  function () {
-    console.log("You will see this message every second");
-  },
-  null,
-  false,
-  "America/Los_Angeles"
-);
-job2.start();
