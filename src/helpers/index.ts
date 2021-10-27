@@ -1,4 +1,5 @@
 import { toString } from "lodash";
+import { db } from "../connect";
 function maxDay(month: number, year: number): number {
   if (
     month == 12 ||
@@ -49,3 +50,20 @@ export function getWeekNow() {
     parseInt(toString(differentDays(new Date("5-3-2021"), new Date()) / 7)) + 1
   );
 }
+
+export const deleteAllAttendance = async () => {
+  return db
+    .collection("Students")
+    .get()
+    .then((querySnapshot) => {
+      querySnapshot.forEach((snapshot) => {
+        db.collection("Students")
+          .doc(snapshot.id)
+          .collection("attendance")
+          .listDocuments()
+          .then((results) => {
+            results.map((result) => result.delete());
+          });
+      });
+    });
+};

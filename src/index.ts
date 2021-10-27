@@ -1,71 +1,12 @@
 import { db } from "./connect";
-import { getWeekNow } from "./helpers";
+import * as express from "express";
+import * as cors from "cors";
+import { updateSchedule } from "./cronjob";
+const app = express();
+app.use(cors());
+app.use(express.json());
+
 const CronJob = require("cron").CronJob;
-
-const updateSchedule = async () => {
-  const template = {
-    morning: [],
-    afternoon: [],
-    status: true,
-    asked: "",
-    note: "",
-  };
-  try {
-    const date = new Date();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    const maxDay = new Date(year, month, 0).getDate();
-    await db
-      .collection("Students")
-      .get()
-      .then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          for (let i = 1; i <= maxDay; i++) {
-            if (i < 10) {
-              db.collection("Students2")
-                .doc(doc.id)
-                .collection("attendance")
-                .doc(`${month}-0${i}-${year}`)
-                .set({
-                  ...template,
-                  week: getWeekNow(),
-                  status: false,
-                  asked: true,
-                  note: "",
-                })
-                .then(() => {
-                  console.log("update student ID", doc.id);
-                })
-                .catch((error) => {
-                  console.log(error);
-                });
-            } else {
-              db.collection("Students2")
-                .doc(doc.id)
-                .collection("attendance")
-                .doc(`${month}-${i}-${year}`)
-                .set({
-                  ...template,
-                  week: getWeekNow(),
-                  status: true,
-                  asked: true,
-                  note: "",
-                })
-                .then(() => {
-                  console.log("update student ID", doc.id);
-                })
-                .catch((error) => {
-                  console.log(error);
-                });
-            }
-          }
-        });
-      });
-  } catch (error) {
-    console.log(error);
-  }
-};
-
 const job = new CronJob(
   "0 0 1 * *",
   updateSchedule,
@@ -74,3 +15,40 @@ const job = new CronJob(
   "America/Los_Angeles"
 );
 job.start();
+
+const port = 4000;
+
+app.get("/api", async (req, res) => {
+  try {
+    const listStudent = (await db.collection("Students").get()).docs.map(
+      async (response) => {
+        const student = response.data();
+
+        const attendances = (
+          await db
+            .collection("Students")
+            .doc(response.id)
+            .collection("attendance")
+            .get()
+        ).docs.map((att) => {
+          return {
+            date: att.id,
+            data: att.data(),
+          };
+        });
+        return {
+          ...student,
+          attendances,
+          uid: student.id,
+        };
+      }
+    );
+    const newList = await Promise.all(listStudent);
+    return res.status(200).send(newList);
+  } catch (error) {
+    console.log(error);
+  }
+});
+app.listen(port, () => {
+  console.log("listening on http://localhost:4000/api" + port);
+});
