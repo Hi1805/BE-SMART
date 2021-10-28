@@ -13,9 +13,7 @@ const port = 4000;
 app.get("/api", async (req, res) => {
   try {
     const { year, month } = req.query;
-    const list = (await db.collection("Students").get()).docs.map((doc) =>
-      doc.data()
-    );
+    const list = (await db.collection("Students").get()).docs;
     const newList = [];
     for (const student of list) {
       newList.push({
