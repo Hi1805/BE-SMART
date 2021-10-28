@@ -1,6 +1,8 @@
 import { db } from "./connect";
 import * as express from "express";
 import * as cors from "cors";
+import { toString, toNumber } from "lodash";
+import { deleteAllAttendance } from "./helpers";
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -9,6 +11,7 @@ const port = 4000;
 
 app.get("/api", async (req, res) => {
   try {
+    const { month, year } = req.query;
     const list = (await db.collection("Students").get()).docs;
     const newList = [];
     for (const student of list) {
@@ -19,6 +22,7 @@ app.get("/api", async (req, res) => {
             .collection("Students")
             .doc(student.id)
             .collection("attendance")
+            .where("month", "==", `${month}-${year}`)
             .get()
         ).docs.map((att) => {
           return {
@@ -29,10 +33,11 @@ app.get("/api", async (req, res) => {
         uid: student.id,
       });
     }
-    const newList2 = await Promise.all(newList);
-    return res.status(200).send(newList2.slice(0, 5));
+    return res.status(200).send(newList);
   } catch (error) {
-    return res.status(401).send("errror");
+    return res.status(401).send({
+      message: error,
+    });
   }
 });
 app.listen(port, () => {
