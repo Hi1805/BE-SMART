@@ -16,21 +16,20 @@ app.get("/api", async (req, res) => {
     const list = (await db.collection("Students").get()).docs;
     const newList = [];
     for (const student of list) {
+      const attendances = (
+        await db
+          .collection("Students")
+          .doc(student.id)
+          .collection("attendance")
+          .where("month", "==", `${month}-${year}`)
+          .get()
+      ).docs.map((item) => ({
+        date: item.id,
+        data: item.data(),
+      }));
       newList.push({
         student: student.data(),
-        attendances: (
-          await db
-            .collection("Students")
-            .doc(student.id)
-            .collection("attendance")
-            .where("month", "==", `${month}-${year}`)
-            .get()
-        ).docs.map((att) => {
-          return {
-            date: att.id,
-            data: att.data(),
-          };
-        }),
+        attendances,
         uid: student.id,
       });
     }
