@@ -1,8 +1,9 @@
 import { db } from "./connect";
 import * as express from "express";
 import * as cors from "cors";
-import { toString, toNumber } from "lodash";
-import { deleteAllAttendance } from "./helpers";
+import * as dotenv from "dotenv";
+dotenv.config();
+
 const app = express();
 app.use(cors());
 app.use(express.json());
