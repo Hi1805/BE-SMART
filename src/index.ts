@@ -48,6 +48,6 @@ app.get("/api", async (req, res) => {
     });
   }
 });
-app.listen(port, () => {
+app.listen(process.env.PORT || 5000, () => {
   console.log("listening on http://localhost:4000/api");
 });
