@@ -27,7 +27,7 @@ app.get("/api", async (req, res) => {
           data: item.data(),
         }));
         return {
-          student: student.data(),
+          ...student.data(),
           attendances,
           uid: student.id,
         };
