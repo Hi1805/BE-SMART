@@ -12,34 +12,31 @@ const port = 4000;
 
 app.get("/api", async (req, res) => {
   try {
-    console.log("run function");
-
-    const { grade } = req.query;
-    console.log("class", grade);
-    const list = (
-      await db.collection("Students").where("class", "==", grade).get()
-    ).docs.map((doc) => doc.data());
-    // const newList = [];
-    // for (const student of list) {
-    //   newList.push({
-    //     student: student.data(),
-    //     attendances: (
-    //       await db
-    //         .collection("Students")
-    //         .doc(student.id)
-    //         .collection("attendance")
-    //         .where("month", "==", `${month}-${year}`)
-    //         .get()
-    //     ).docs.map((att) => {
-    //       return {
-    //         date: att.id,
-    //         data: att.data(),
-    //       };
-    //     }),
-    //     uid: student.id,
-    //   });
-    // }
-    // console.log("================== run midlle 3 ================");
+    const { year, month } = req.query;
+    const list = (await db.collection("Students").get()).docs.map((doc) =>
+      doc.data()
+    );
+    const newList = [];
+    for (const student of list) {
+      newList.push({
+        student: student.data(),
+        attendances: (
+          await db
+            .collection("Students")
+            .doc(student.id)
+            .collection("attendance")
+            .where("month", "==", `${month}-${year}`)
+            .get()
+        ).docs.map((att) => {
+          return {
+            date: att.id,
+            data: att.data(),
+          };
+        }),
+        uid: student.id,
+      });
+    }
+    console.log("================== run midlle 3 ================");
     return res.status(200).send(list);
   } catch (error) {
     console.log(error);
