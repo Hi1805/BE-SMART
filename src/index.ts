@@ -11,8 +11,12 @@ const port = 4000;
 
 app.get("/api", async (req, res) => {
   try {
+    console.log("================== run midlle ================");
+
     const { month, year } = req.query;
     const list = (await db.collection("Students").get()).docs;
+    console.log("================== run midlle 2 ================");
+
     const newList = [];
     for (const student of list) {
       newList.push({
@@ -33,6 +37,8 @@ app.get("/api", async (req, res) => {
         uid: student.id,
       });
     }
+    console.log("================== run midlle 3 ================");
+
     return res.status(200).send(newList);
   } catch (error) {
     return res.status(401).send({
